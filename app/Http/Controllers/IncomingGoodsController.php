@@ -39,8 +39,8 @@ class IncomingGoodsController extends Controller
                 'supplier_id' => 'required',
                 'date' => 'required',
                 'products' => 'required|array',
-                'product.*.product_id' => 'required',
-                'product.*.qty' => 'required|numeric',
+                'products.*.product_id' => 'required',
+                'products.*.qty' => 'required|numeric',
             ];
             $validator = Validator::make($input, $validationRules);
             if ($validator->fails()) {

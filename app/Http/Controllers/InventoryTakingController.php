@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InventoryTaking;
+use App\Models\InventoryTakingDetail;
 use Illuminate\Http\Request;
-use App\Models\OutcomingGoods;
-use App\Models\OutcomingGoodsDetail;
 use App\Models\Product;
 use App\Response\ApiBaseResponse;
 use Exception;
@@ -12,21 +12,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class OutcomingGoodsController extends Controller
+class InventoryTakingController extends Controller
 {
     private $response;
     private $model;
 
     public function __construct()
     {
-        $this->model = new OutcomingGoods();
+        $this->model = new InventoryTaking();
         $this->response = new ApiBaseResponse();
     }
 
     public function index()
     {
         $data = $this->model
-            ->with(['outcomingGoodsDetail'])
+            ->with(['inventoryTakingDetail'])
             ->orderBy('created_at', 'DESC')
             ->paginate(10);
         return response()->json($this->response->singleData($data, []), 200);
@@ -38,12 +38,12 @@ class OutcomingGoodsController extends Controller
         try {
             $input = $request->all();
             $validationRules = [
-                'invoice' => 'required',
-                'customer_id' => 'required',
+                'transaction_code' => 'required',
                 'date' => 'required',
                 'products' => 'required|array',
                 'products.*.product_id' => 'required',
-                'products.*.qty' => 'required|numeric',
+                'products.*.final_qty' => 'required|numeric',
+                'products.*.note' => 'required',
             ];
             $validator = Validator::make($input, $validationRules);
             if ($validator->fails()) {
@@ -51,22 +51,21 @@ class OutcomingGoodsController extends Controller
             }
             $data = $this->model;
 
-            $data->invoice = $request->invoice;
-            $data->customer_id = $request->customer_id;
+            $data->transaction_code = $request->transaction_code;
             $data->date = $request->date;
             $data->user_id = Auth::user()->id;
             $data->save();
 
             foreach ($request->products as $product) {
-               $incomingGoodsDetail = new OutcomingGoodsDetail();
-               $incomingGoodsDetail->outcoming_goods_id = $data->id;
-               $incomingGoodsDetail->product_id = $product['product_id'];
-               $incomingGoodsDetail->qty = $product['qty'];
-               $incomingGoodsDetail->save();
-
-               $addStock = Product::where('id','=',$product['product_id'])->first();
-               $addStock->stock = $addStock->stock - $product['qty'];
-               $addStock->update();
+                $detail = new InventoryTakingDetail();
+                $initialQty = Product::where('id', '=', $product['product_id'])->first()->stock;
+                $detail->inventory_taking_id = $data->id;
+                $detail->product_id = $product['product_id'];
+                $detail->initial_qty = $initialQty;
+                $detail->final_qty = $product['final_qty'];
+                $detail->difference = $initialQty - $product['final_qty'];
+                $detail->note = $product['note'];
+                $detail->save();
             }
 
             DB::commit();
@@ -79,9 +78,7 @@ class OutcomingGoodsController extends Controller
 
     public function show($id)
     {
-        $data = $this->model
-            ->with(['outcomingGoodsDetail'])
-            ->findOrFail($id);
+        $data = $this->model->with(['inventoryTakingDetail'])->findOrFail($id);
         return response()->json($this->response->singleData($data, []), 200);
     }
 

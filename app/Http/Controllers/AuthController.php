@@ -15,7 +15,7 @@ class AuthController extends Controller
 
         $validationRules = [
             'email'=>'required|string',
-            'password'=>'required|string',
+            'password'=>'required|string|confirmed',
         ];
         $validator = Validator::make($input, $validationRules);
         if ($validator->fails()) {
@@ -37,8 +37,9 @@ class AuthController extends Controller
         $validationRules = [
             'name'=>'required',
             'email'=>'required|unique:users|email',
+            'password'=>'required|confirmed',
             'role'=>'required',
-          
+
         ];
         $validator = Validator::make($input, $validationRules);
         if ($validator->fails()) {

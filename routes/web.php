@@ -53,4 +53,9 @@ $router->group(['middleware'=>['auth']], function ($router) {
     $router->post('/outcoming-goods', 'OutcomingGoodsController@store');
     $router->get('/outcoming-goods/{id}', 'OutcomingGoodsController@show');
     $router->delete('/outcoming-goods/{id}', 'OutcomingGoodsController@delete');
+
+    $router->get('/inventory-taking', 'InventoryTakingController@index');
+    $router->post('/inventory-taking', 'InventoryTakingController@store');
+    $router->get('/inventory-taking/{id}', 'InventoryTakingController@show');
+    $router->delete('/inventory-taking/{id}', 'InventoryTakingController@delete');
 });
