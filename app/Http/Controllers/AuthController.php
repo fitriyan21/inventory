@@ -16,7 +16,7 @@ class AuthController extends Controller
 
         $validationRules = [
             'email'=>'required|string',
-            'password'=>'required|string|confirmed',
+            'password'=>'required|string',
         ];
         $validator = Validator::make($input, $validationRules);
         if ($validator->fails()) {

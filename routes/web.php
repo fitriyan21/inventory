@@ -52,14 +52,14 @@ $router->group(['middleware'=>['auth']], function ($router) {
     $router->get('/incoming-goods/{id}', 'IncomingGoodsController@show');
     $router->delete('/incoming-goods/{id}', 'IncomingGoodsController@delete');
     $router->get('/incoming-goods/search-by-invoice/{invoice}', 'IncomingGoodsController@getByInvoice');
-    $router->post('/incoming-goods/search-by-rang-dae', 'IncomingGoodsController@getByRangeDate');
+    $router->post('/incoming-goods/search-by-range-date', 'IncomingGoodsController@getByRangeDate');
     //outcoming goods
     $router->get('/outcoming-goods', 'OutcomingGoodsController@index');
     $router->post('/outcoming-goods', 'OutcomingGoodsController@store');
     $router->get('/outcoming-goods/{id}', 'OutcomingGoodsController@show');
     $router->delete('/outcoming-goods/{id}', 'OutcomingGoodsController@delete');
     $router->get('/outcoming-goods/search-by-invoice/{invoice}', 'OutcomingGoodsController@getByInvoice');
-    $router->post('/outcoming-goods/search-by-rang-dae', 'OutcomingGoodsController@getByRangeDate');
+    $router->post('/outcoming-goods/search-by-range-date', 'OutcomingGoodsController@getByRangeDate');
     //inventori_taking
     $router->get('/inventory-taking', 'InventoryTakingController@index');
     $router->post('/inventory-taking', 'InventoryTakingController@store');

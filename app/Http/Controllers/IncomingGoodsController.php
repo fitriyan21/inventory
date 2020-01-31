@@ -128,7 +128,7 @@ class IncomingGoodsController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 400);
             }
-            $data = $this->model->whereBetween('created_at', [$request->date_start, $request->date_end])
+            $data = $this->model->whereBetween('date', [$request->date_start, $request->date_end])
                 ->with(['incomingGoodsDetail'])
                 ->get();
             return response()->json($this->response->singleData($data, []), 200);
