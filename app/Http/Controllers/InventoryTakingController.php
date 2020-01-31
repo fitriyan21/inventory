@@ -25,11 +25,16 @@ class InventoryTakingController extends Controller
 
     public function index()
     {
-        $data = $this->model
-            ->with(['inventoryTakingDetail'])
-            ->orderBy('created_at', 'DESC')
-            ->paginate(10);
-        return response()->json($this->response->singleData($data, []), 200);
+        try{
+            $data = $this->model
+                ->with(['inventoryTakingDetail'])
+                ->orderBy('created_at', 'DESC')
+                ->paginate(10);
+            return response()->json($this->response->singleData($data, []), 200);
+        }catch (Exception $e){
+            return response()->json($this->response
+                ->status("ERROR", $e->getMessage(), null), 500);
+        }
     }
 
     public function store(Request $request)
@@ -50,12 +55,10 @@ class InventoryTakingController extends Controller
                 return response()->json($validator->errors(), 400);
             }
             $data = $this->model;
-
             $data->transaction_code = $request->transaction_code;
             $data->date = $request->date;
             $data->user_id = Auth::user()->id;
             $data->save();
-
             foreach ($request->products as $product) {
                 $detail = new InventoryTakingDetail();
                 $initialQty = Product::where('id', '=', $product['product_id'])->first()->stock;
@@ -67,25 +70,39 @@ class InventoryTakingController extends Controller
                 $detail->note = $product['note'];
                 $detail->save();
             }
-
             DB::commit();
             return response()->json($this->response->singleData($data, []), 200);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json($this->response->status("ERROR", $e->getMessage(), null), 500);
+            return response()->json($this->response
+                ->status("ERROR", $e->getMessage(), null), 500);
         }
     }
 
     public function show($id)
     {
-        $data = $this->model->with(['inventoryTakingDetail'])->findOrFail($id);
-        return response()->json($this->response->singleData($data, []), 200);
+        try{
+            $data = $this->model->with(['inventoryTakingDetail'])->findOrFail($id);
+            return response()->json($this->response->singleData($data, []), 200);
+        }catch (Exception $e){
+            return response()->json($this->response
+                ->status("ERROR", $e->getMessage(), null), 500);
+        }
     }
 
     public function delete($id)
     {
-        $data = $this->model->findOrFail($id);
-        $data->delete();
-        return response()->json($this->response->status(200, "Success Deleted", null), 200);
+        DB::beginTransaction();
+        try {
+            $data = $this->model->findOrFail($id);
+            $data->delete();
+            DB::commit();
+            return response()->json($this->response
+                ->status(200, "Success Deleted", null), 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json($this->response
+                ->status("ERROR", $e->getMessage(), null), 500);
+        }
     }
 }

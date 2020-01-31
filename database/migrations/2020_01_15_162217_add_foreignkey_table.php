@@ -23,7 +23,8 @@ class AddForeignkeyTable extends Migration
         });
 
         Schema::table('incoming_goods_details', function ($table) {
-            $table->foreign('incoming_goods_id')->references('id')->on('incoming_goods')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('incoming_goods_id')->references('id')->on('incoming_goods')
+                ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');
         });
 
@@ -33,7 +34,8 @@ class AddForeignkeyTable extends Migration
         });
 
         Schema::table('outcoming_goods_details', function ($table) {
-            $table->foreign('outcoming_goods_id')->references('id')->on('outcoming_goods')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('outcoming_goods_id')->references('id')->on('outcoming_goods')
+                ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');
         });
 
@@ -42,7 +44,8 @@ class AddForeignkeyTable extends Migration
         });
 
         Schema::table('inventory_taking_details', function ($table) {
-            $table->foreign('inventory_taking_id')->references('id')->on('inventory_taking')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('inventory_taking_id')->references('id')->on('inventory_taking')
+                ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products');
         });
     }

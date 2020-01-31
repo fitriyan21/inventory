@@ -18,7 +18,7 @@ class CreateIncomingGoodsTable extends Migration
             $table->string('invoice');
             $table->bigInteger('supplier_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
-            $table->string('date');
+            $table->date('date');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -45,7 +46,9 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        
+        if (!Gate::allows("register-user",Auth::user())){
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
         $user = User::create([
             "name"=>$input['name'],
             "email"=>$input['email'],
